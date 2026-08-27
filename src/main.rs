@@ -1,6 +1,7 @@
 #![allow(unused)]
 mod builtins;
 mod parser;
+mod executor;
 
 //import write trait
 use std::io::{self,Write};
@@ -18,7 +19,7 @@ fn main(){
         let input = parser::parse_base(input);
         let is_builtin = builtins::execute(input[0],&input[1..]);
         if !(is_builtin){
-
+            executor::execute(input[0],&input[1..]);
             //check if external
 
 

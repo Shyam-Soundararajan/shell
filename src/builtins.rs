@@ -16,9 +16,6 @@ pub fn get_cur_dir() -> String{
     env::current_dir().unwrap().to_str().unwrap().to_string()
 }
 pub fn execute(cmd: &str, args: &[&str]) -> bool{
-    for i in args.iter(){
-        println!("{}",i);
-    }
     match cmd{
         "exit" => {
             process::exit(0);
