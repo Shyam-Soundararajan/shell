@@ -40,9 +40,16 @@ pub fn execute(cmd: &str, args: &[&str]) -> bool{
             }
             true
         }
-
+        "pwd" => {
+            println!("{}",get_cur_dir());
+            true
+        }
         "clear" => {
             println!("\x1B[2J\x1B[H");
+            true
+        }
+        "echo" => {
+            //to be implemented
             true
         }
 

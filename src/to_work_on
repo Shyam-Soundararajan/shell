@@ -1,3 +1,1 @@
-path resolution
-debug:
-    when some other external function is called and then exit is entered it is swallowed somewhere
+augment parser for quotes etc

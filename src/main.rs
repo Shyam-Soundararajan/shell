@@ -14,6 +14,7 @@ fn main(){
         io::stdout().flush().unwrap();
 
         let mut input = String::new();
+
         io::stdin().read_line(&mut input).expect("Failed to read line");
         let input = input.trim();
         let input = parser::parse_base(input);
