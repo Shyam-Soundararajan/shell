@@ -1,1 +1,4 @@
 augment parser for quotes etc
+enhance builtins
+handle child process perm failure
+core shell features like arrow up arrow left right etc and background execution

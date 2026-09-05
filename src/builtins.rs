@@ -18,6 +18,7 @@ pub fn get_cur_dir() -> String{
 pub fn execute(cmd: &str, args: &[&str]) -> bool{
     match cmd{
         "exit" => {
+            crate::input::disable_raw_mode();
             process::exit(0);
         }
 
@@ -34,6 +35,9 @@ pub fn execute(cmd: &str, args: &[&str]) -> bool{
                         println!("Cannot find directory: {}",args[0]);
                     }
                 }
+            }
+            else if args.len() == 0{
+
             }
             else{
                 println!("Too many arguments");
