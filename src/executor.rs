@@ -12,7 +12,7 @@ use crate::parser::parse_path;
 //path validity
 use std::path::Path;
 
-pub fn execute(cmd: &str, args: &[&str]) -> Result<(), String> {
+pub fn execute(cmd: &str, args: &[&str], background: bool) -> Result<(), String> {
     let mut cmd_path = cmd.to_string();
     let pid = unsafe { fork() };
 
@@ -40,16 +40,18 @@ pub fn execute(cmd: &str, args: &[&str]) -> Result<(), String> {
         else{
             let path_list = env::var_os("PATH");
             let mut valid_ext = false;
-            for i in path_list.unwrap().to_string_lossy().split(':') {
-                let full_path = i.to_string() + "/" + cmd;
-                if Path::new(&full_path).exists(){
-                    cmd_path = full_path;
-                    valid_ext = true;
-                    break;
+            if let Some(paths) = path_list {
+                for i in paths.to_string_lossy().split(':') {
+                    let full_path = i.to_string() + "/" + cmd;
+                    if Path::new(&full_path).exists(){
+                        cmd_path = full_path;
+                        valid_ext = true;
+                        break;
+                    }
                 }
             }
             if !valid_ext {
-                println!("{} : Command not found!",cmd);
+                println!("{}: command not found", cmd);
                 std::process::exit(1);
             }
         }
@@ -88,13 +90,19 @@ pub fn execute(cmd: &str, args: &[&str]) -> Result<(), String> {
             let execve_status = execve(c_args[0].as_ptr(), argv.as_ptr(), envp.as_ptr());
             if execve_status != 0 {
                 let err = std::io::Error::last_os_error();
-                println!("Execve failed : {}",err);
+                println!("{}: {}", cmd, err);
+                std::process::exit(1);
             }
         }
         std::process::exit(0);
     }
 
     else {
+        if background {
+            println!("[{}]", pid);
+            return Ok(());
+        }
+
         let result = unsafe {
             waitpid(pid, ptr::null_mut(), 0)
         };

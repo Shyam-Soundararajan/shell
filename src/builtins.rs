@@ -4,17 +4,27 @@ use std::process;
 use std::fs;
 //curdir
 use std::env;
-fn  ls(cur_dir: &str){
-    let entries = fs::read_dir(cur_dir).unwrap();
-    for entry in entries{
-        let entry = entry.unwrap();
-        print!("{} ",entry.file_name().to_string_lossy());
+
+fn ls(cur_dir: &str){
+    match fs::read_dir(cur_dir) {
+        Ok(entries) => {
+            for entry in entries{
+                if let Ok(entry) = entry {
+                    print!("{} ",entry.file_name().to_string_lossy());
+                }
+            }
+            println!();
+        }
+        Err(e) => {
+            println!("ls: cannot access '{}': {}", cur_dir, e);
+        }
     }
-    println!();
 }
+
 pub fn get_cur_dir() -> String{
     env::current_dir().unwrap().to_str().unwrap().to_string()
 }
+
 pub fn execute(cmd: &str, args: &[&str]) -> bool{
     match cmd{
         "exit" => {
@@ -23,7 +33,16 @@ pub fn execute(cmd: &str, args: &[&str]) -> bool{
         }
 
         "ls" => {
-            ls(".");
+            if args.len() == 0 {
+                ls(".");
+            } else {
+                for arg in args {
+                    if args.len() > 1 {
+                        println!("{}:", arg);
+                    }
+                    ls(arg);
+                }
+            }
             true
         }
 
@@ -32,15 +51,21 @@ pub fn execute(cmd: &str, args: &[&str]) -> bool{
                 match env::set_current_dir(args[0]){
                     Ok(_) => {}
                     Err(_) => {
-                        println!("Cannot find directory: {}",args[0]);
+                        println!("cd: {}: No such file or directory",args[0]);
                     }
                 }
             }
             else if args.len() == 0{
-
+                if let Ok(home) = env::var("HOME") {
+                    if let Err(_) = env::set_current_dir(&home) {
+                        println!("cd: {}: No such file or directory", home);
+                    }
+                } else {
+                    println!("cd: HOME not set");
+                }
             }
             else{
-                println!("Too many arguments");
+                println!("cd: too many arguments");
             }
             true
         }
@@ -53,7 +78,7 @@ pub fn execute(cmd: &str, args: &[&str]) -> bool{
             true
         }
         "echo" => {
-            //to be implemented
+            println!("{}", args.join(" "));
             true
         }
 
